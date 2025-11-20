@@ -1,8 +1,12 @@
 package com.producttrial.back.service;
 
+import com.producttrial.back.dto.ProductDTO;
 import com.producttrial.back.entity.Product;
+import com.producttrial.back.mapper.ProductMapper;
 import com.producttrial.back.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +17,7 @@ import java.util.Optional;
 public class ProductServiceImpl implements IProductService{
     private final ProductRepository productRepository;
 
+    // Méthodes de Product
     @Override
     public List<Product> findAll() {
         return productRepository.findAll();
@@ -54,5 +59,25 @@ public class ProductServiceImpl implements IProductService{
     @Override
     public void delete(Long id) {
         productRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteAll() {
+        productRepository.deleteAll();
+    }
+
+    // Méthodes de ProductDTO
+
+    @Override
+    public Page<ProductDTO> getAllProducts(Pageable pageable) {
+        return productRepository
+                .findAll(pageable)
+                .map(ProductMapper::toDto);
+    }
+
+    @Override
+    public Optional<ProductDTO> getProductById(Long id) {
+        return productRepository.findById(id)
+                .map(ProductMapper::toDto);
     }
 }
