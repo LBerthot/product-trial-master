@@ -2,11 +2,13 @@ package com.producttrial.back.controller;
 
 import com.producttrial.back.dto.ProductDTO;
 import com.producttrial.back.entity.Product;
+import com.producttrial.back.exception.GlobalExceptionHandler;
 import com.producttrial.back.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -18,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@Import(GlobalExceptionHandler.class)
 class ProductControllerIT {
     @Autowired
     private WebApplicationContext wac;
@@ -101,7 +104,8 @@ class ProductControllerIT {
     void getProduct_returnProduct_notFound() throws Exception {
         mockMvc.perform(get("/products/10")
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404));
     }
 
     @Test
@@ -131,7 +135,12 @@ class ProductControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(productCreateDTO))
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.fields.code").value("Code is required"))
+                .andExpect(jsonPath("$.fields.price").value("Price must be greater than 0"));
     }
 
     @Test
@@ -166,7 +175,8 @@ class ProductControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(productUpdateDTO))
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404));;
     }
 
     @Test
@@ -178,6 +188,10 @@ class ProductControllerIT {
     @Test
     void deleteProduct_returnsNotFound() throws Exception {
         mockMvc.perform(delete("/products/{id}", 10L))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.message").value("Product with id 10 not found"))
+                .andExpect(jsonPath("$.path").value("/products/10"));
     }
 }
