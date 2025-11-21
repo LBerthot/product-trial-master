@@ -1,0 +1,319 @@
+{
+	"info": {
+		"_postman_id": "481f0129-f8ee-49c3-8d78-2be5f904abf8",
+		"name": "product-trial",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49509869",
+		"_collection_link": "https://lberthot-6209925.postman.co/workspace/Ludivine-B's-Workspace~b0a7c2dc-b084-4593-8615-27737643abf8/collection/49509869-481f0129-f8ee-49c3-8d78-2be5f904abf8?action=share&source=collection_link&creator=49509869"
+	},
+	"item": [
+		{
+			"name": "product",
+			"item": [
+				{
+					"name": "OK",
+					"item": [
+						{
+							"name": "/products",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/products",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"products"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/products avec page et tri",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/products?page=0&size=1&sort=name,desc",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"products"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "1"
+										},
+										{
+											"key": "sort",
+											"value": "name,desc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/products/id",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/products/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"products",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/products",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"name\": \"Clavier mécanique\",\r\n  \"code\": \"MK-001\",\r\n  \"description\": \"Clavier mécanique RGB switches rouges\",\r\n  \"price\": 79.90,\r\n  \"quantity\": 25,\r\n  \"category\": \"Périphériques\",\r\n  \"image\": \"https://example.com/images/keyboard.jpg\",\r\n  \"internalReference\": \"INT-001\",\r\n  \"shellId\": 15,\r\n  \"inventoryStatus\": \"INSTOCK\",\r\n  \"rating\": 4.5\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/products",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"products"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/products/id",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"name\": \"Clavier mécanique\",\r\n  \"code\": \"MK-TEST\",\r\n  \"description\": \"Clavier mécanique RGB switches rouges\",\r\n  \"price\": 79.90,\r\n  \"quantity\": 25,\r\n  \"category\": \"Périphériques\",\r\n  \"image\": \"https://example.com/images/keyboard.jpg\",\r\n  \"internalReference\": \"INT-001\",\r\n  \"shellId\": 15,\r\n  \"inventoryStatus\": \"INSTOCK\",\r\n  \"rating\": 4.5\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/products/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"products",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/products/id",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"name\": \"Clavier mécanique\",\r\n  \"code\": \"MK-TEST\",\r\n  \"description\": \"Clavier mécanique RGB switches rouges\",\r\n  \"price\": 79.90,\r\n  \"quantity\": 25,\r\n  \"category\": \"Périphériques\",\r\n  \"image\": \"https://example.com/images/keyboard.jpg\",\r\n  \"internalReference\": \"INT-001\",\r\n  \"shellId\": 15,\r\n  \"inventoryStatus\": \"INSTOCK\",\r\n  \"rating\": 4.5\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/products/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"products",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "KO",
+					"item": [
+						{
+							"name": "/products KO",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/products?page=0&size=500",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"products"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "500"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/products/id not found",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/products/10000",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"products",
+										"10000"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/products",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"name\": \"Clavier mécanique\",\r\n  \"description\": \"Clavier mécanique RGB switches rouges\",\r\n  \"price\": 79.90,\r\n  \"quantity\": 25,\r\n  \"category\": \"Périphériques\",\r\n  \"image\": \"https://example.com/images/keyboard.jpg\",\r\n  \"internalReference\": \"INT-001\",\r\n  \"shellId\": 15,\r\n  \"inventoryStatus\": \"INSTOCK\",\r\n  \"rating\": 4.5\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/products",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"products"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/products/id",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"name\": \"Clavier mécanique\",\r\n  \"code\": \"MK-TEST\",\r\n  \"description\": \"Clavier mécanique RGB switches rouges\",\r\n  \"price\": 79.90,\r\n  \"quantity\": 25,\r\n  \"category\": \"Périphériques\",\r\n  \"image\": \"https://example.com/images/keyboard.jpg\",\r\n  \"internalReference\": \"INT-001\",\r\n  \"shellId\": 15,\r\n  \"inventoryStatus\": \"INSTOCK\",\r\n  \"rating\": 4.5\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/products/10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"products",
+										"10"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/products/id",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"name\": \"Clavier mécanique\",\r\n  \"code\": \"MK-TEST\",\r\n  \"description\": \"Clavier mécanique RGB switches rouges\",\r\n  \"price\": 79.90,\r\n  \"quantity\": 25,\r\n  \"category\": \"Périphériques\",\r\n  \"image\": \"https://example.com/images/keyboard.jpg\",\r\n  \"internalReference\": \"INT-001\",\r\n  \"shellId\": 15,\r\n  \"inventoryStatus\": \"INSTOCK\",\r\n  \"rating\": 4.5\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/products/10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"products",
+										"10"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}

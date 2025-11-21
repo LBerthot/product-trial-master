@@ -8,6 +8,23 @@ public class ProductMapper {
         throw new UnsupportedOperationException("Utility class");
     }
 
+    public static Product toEntity(ProductDTO dto) {
+        return Product.builder()
+                .id(dto.getId())
+                .code(dto.getCode())
+                .name(dto.getName())
+                .description(dto.getDescription())
+                .image(dto.getImage())
+                .category(dto.getCategory())
+                .price(dto.getPrice())
+                .quantity(dto.getQuantity())
+                .internalReference(dto.getInternalReference())
+                .shellId(dto.getShellId())
+                .inventoryStatus(dto.getInventoryStatus())
+                .rating(dto.getRating())
+                .build();
+    }
+
     public static ProductDTO toDto(Product product) {
         return ProductDTO.builder()
                 .id(product.getId())

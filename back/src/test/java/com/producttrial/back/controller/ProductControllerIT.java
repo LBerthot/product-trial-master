@@ -1,5 +1,6 @@
 package com.producttrial.back.controller;
 
+import com.producttrial.back.dto.ProductDTO;
 import com.producttrial.back.entity.Product;
 import com.producttrial.back.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,8 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import tools.jackson.databind.ObjectMapper;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -21,6 +23,9 @@ class ProductControllerIT {
     private WebApplicationContext wac;
 
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private ProductRepository productRepository;
@@ -97,5 +102,82 @@ class ProductControllerIT {
         mockMvc.perform(get("/products/10")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void createProduct_returnsCreatedProduct() throws Exception {
+        ProductDTO productCreateDTO = ProductDTO.builder()
+                .name("X2")
+                .code("C3")
+                .price(10.00D)
+                .build();
+
+        mockMvc.perform(post("/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(productCreateDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("X2"))
+                .andExpect(jsonPath("$.code").value("C3"))
+                .andExpect(jsonPath("$.price").value(10.00D));
+    }
+    @Test
+    void createProduct_returnsBadRequest() throws Exception {
+        ProductDTO productCreateDTO = ProductDTO.builder()
+                .name("X2")
+                .price(-10.00D)
+                .build();
+        mockMvc.perform(post("/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(productCreateDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void updateProduct_returnsUpdatedProduct() throws Exception {
+        ProductDTO productUpdateDTO = ProductDTO.builder()
+                .id(product1.getId())
+                .name("X2")
+                .code("C3")
+                .price(10.00D)
+                .build();
+
+        mockMvc.perform(put("/products/{id}", product1.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(productUpdateDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("X2"))
+                .andExpect(jsonPath("$.code").value("C3"))
+                .andExpect(jsonPath("$.price").value(10.00D));
+    }
+
+    @Test
+    void updateProduct_returnsNotFound() throws Exception {
+        ProductDTO productUpdateDTO = ProductDTO.builder()
+                .id(10L)
+                .name("X2")
+                .code("C3")
+                .price(10.00D)
+                .build();
+
+        mockMvc.perform(put("/products/{id}", 100L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(productUpdateDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteProduct_returnsNoContent() throws Exception {
+        mockMvc.perform(delete("/products/{id}", product1.getId()))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deleteProduct_returnsNotFound() throws Exception {
+        mockMvc.perform(delete("/products/{id}", 10L))
+                .andExpect(status().isInternalServerError());
     }
 }
