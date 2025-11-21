@@ -1,11 +1,15 @@
 package com.producttrial.back.service;
 
+import com.producttrial.back.dto.ProductDTO;
 import com.producttrial.back.entity.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface IProductService {
+    // Méthodes de Product
     /**
      * Retrieves a list of all available products.
      *
@@ -40,4 +44,30 @@ public interface IProductService {
      * @param id the unique identifier of the product to be deleted
      */
     void delete(Long id);
+
+    /**
+     * Deletes all products from the database.
+     * This operation removes all records associated with products, leaving the database empty.
+     * Typically used for cleanup or reset purposes.
+     */
+    void deleteAll();
+
+    // Méthode de ProductDTO
+
+    /**
+     * Retrieves a paginated list of all available products and maps them to ProductDTO objects.
+     *
+     * @param pageable the pagination and sorting information
+     * @return a list of ProductDTO objects representing the products. If no products are found, an empty list will be returned.
+     */
+    Page<ProductDTO> getAllProducts(Pageable pageable);
+
+    /**
+     * Retrieves a product by its unique identifier and maps it to a ProductDTO.
+     *
+     * @param id the unique identifier of the product to retrieve
+     * @return a ProductDTO object representing the product details, or null if no product exists with the given id
+     */
+    Optional<ProductDTO> getProductById(Long id);
+
 }

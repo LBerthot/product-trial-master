@@ -32,7 +32,7 @@ public class Product {
     private String category;
 
     @Column(nullable = false)
-    private Double price; //TODO ou bigDecimal? A déterminer plus tard
+    private Double price;
 
     private Integer quantity;
 
