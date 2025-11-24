@@ -48,16 +48,16 @@ public class ProductController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ProductDTO createProduct(@RequestBody @Valid ProductDTO productCreateDTO) {
-        log.info("POST /products - payload name={}, code={}", productCreateDTO.getName(), productCreateDTO.getCode());
-        Product saved = productService.save(ProductMapper.toEntity(productCreateDTO));
+    public ProductDTO createProduct(@RequestBody @Valid ProductDTO productDTO) {
+        log.info("POST /products - payload name={}, code={}", productDTO.getName(), productDTO.getCode());
+        Product saved = productService.save(ProductMapper.toEntity(productDTO));
         return ProductMapper.toDto(saved);
     }
 
     @PutMapping("/{id}")
-    public ProductDTO updateProduct(@PathVariable @Positive Long id, @RequestBody @Valid ProductDTO productUpdateDTO) {
-        log.info("PUT /products/{} - payload name={}, code={}", id, productUpdateDTO.getName(), productUpdateDTO.getCode());
-        Product updated = productService.update(id, ProductMapper.toEntity(productUpdateDTO));
+    public ProductDTO updateProduct(@PathVariable @Positive Long id, @RequestBody @Valid ProductDTO productDTO) {
+        log.info("PUT /products/{} - payload name={}, code={}", id, productDTO.getName(), productDTO.getCode());
+        Product updated = productService.update(id, ProductMapper.toEntity(productDTO));
         return ProductMapper.toDto(updated);
     }
 
