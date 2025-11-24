@@ -22,7 +22,7 @@ jobs:
           java-version: '21'
 
       - name: Build project
-        run: mvn clean install -DskipTests=true  
+        run: mvn -f back/pom.xml clean install -DskipTests=true
   test-on-pr:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
@@ -39,4 +39,4 @@ jobs:
           java-version: '21'
 
       - name: Run tests
-        run: mvn test 
+        run: mvn -f back/pom.xml test
