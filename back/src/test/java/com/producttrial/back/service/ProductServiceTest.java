@@ -29,7 +29,7 @@ class ProductServiceTest {
         when(productRepository.findAll()).thenReturn(List.of(new Product(), new Product()));
 
         List<Product> result = productService.findAll();
-        assertEquals(2, result.size(), "list should contain 1 element");
+        assertEquals(2, result.size(), "list should contain 2 element");
     }
     @Test
     void findById_whenPresent_returnsOptionalProduct() {
@@ -134,6 +134,12 @@ class ProductServiceTest {
         productService.delete(5L);
 
         verify(productRepository, times(1)).deleteById(5L);
+    }
+
+    @Test
+    void deleteAll_callsRepositoryDeleteAll() {
+        productService.deleteAll();
+        verify(productRepository, times(1)).deleteAll();
     }
 
 }

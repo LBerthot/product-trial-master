@@ -1,6 +1,7 @@
 package com.producttrial.back.dto;
 
 import com.producttrial.back.enums.InventoryStatus;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -14,9 +15,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ProductDTO {
     private Long id;
-    @NotNull(message = "Code is required")
+    @NotBlank(message = "Code is required")
     private String code;
-    @NotNull(message = "Name is required")
+    @NotBlank(message = "Name is required")
     private String name;
     private String description;
     private String image;

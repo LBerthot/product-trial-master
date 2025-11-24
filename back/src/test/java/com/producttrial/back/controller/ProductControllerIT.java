@@ -176,7 +176,7 @@ class ProductControllerIT {
                         .content(objectMapper.writeValueAsString(productUpdateDTO))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.status").value(404));;
+                .andExpect(jsonPath("$.status").value(404));
     }
 
     @Test
