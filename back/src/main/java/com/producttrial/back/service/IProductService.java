@@ -34,7 +34,12 @@ public interface IProductService {
     Product save(Product product);
 
     /**
+     * Updates an existing product identified by its unique ID with the details provided.
+     * If the product with the specified ID is not found, an exception is thrown.
      *
+     * @param id the unique identifier of the product to update
+     * @param product the product object containing updated details to be applied to the existing product
+     * @return the updated product
      */
     Product update(Long id, Product product);
 
