@@ -3,8 +3,8 @@ package com.producttrial.back.controller;
 import com.producttrial.back.dto.AuthRequestDTO;
 import com.producttrial.back.dto.AuthResponseDTO;
 import com.producttrial.back.entity.User;
+import com.producttrial.back.service.IJwtService;
 import com.producttrial.back.service.IUserService;
-import com.producttrial.back.service.JwtService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +24,8 @@ import org.springframework.web.server.ResponseStatusException;
 public class AuthController {
 
     private final IUserService userService;
+    private final IJwtService jwtService;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
 
 
     @PostMapping

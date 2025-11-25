@@ -3,9 +3,11 @@ package com.producttrial.back.controller;
 import com.producttrial.back.dto.ProductDTO;
 import com.producttrial.back.entity.Product;
 import com.producttrial.back.mapper.ProductMapper;
+import com.producttrial.back.service.IAuthorizationService;
 import com.producttrial.back.service.IProductService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,13 +22,11 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/products")
 @Validated
 @Slf4j
+@AllArgsConstructor
 public class ProductController {
     private final IProductService productService;
-
-    public ProductController(IProductService productService) {
-        this.productService = productService;
-    }
-
+    private final IAuthorizationService authzService;
+    
     @GetMapping
     public Page<ProductDTO> getAllProducts(@PageableDefault(size = 50, page = 0) Pageable pageable) {
         log.info("GET /products page={} size={}", pageable.getPageNumber(), pageable.getPageSize());
@@ -49,6 +49,8 @@ public class ProductController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProductDTO createProduct(@RequestBody @Valid ProductDTO productDTO) {
+        authzService.ensureAdmin();
+
         log.info("POST /products - payload name={}, code={}", productDTO.getName(), productDTO.getCode());
         Product saved = productService.save(ProductMapper.toEntity(productDTO));
         return ProductMapper.toDto(saved);
@@ -56,6 +58,8 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ProductDTO updateProduct(@PathVariable @Positive Long id, @RequestBody @Valid ProductDTO productDTO) {
+        authzService.ensureAdmin();
+
         log.info("PUT /products/{} - payload name={}, code={}", id, productDTO.getName(), productDTO.getCode());
         Product updated = productService.update(id, ProductMapper.toEntity(productDTO));
         return ProductMapper.toDto(updated);
@@ -64,6 +68,8 @@ public class ProductController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProduct(@PathVariable @Positive Long id) {
+        authzService.ensureAdmin();
+
         log.info("DELETE /products/{}", id);
         productService.delete(id);
     }

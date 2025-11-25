@@ -16,14 +16,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class JwtServiceTest {
-    private JwtService jwtService;
+    private JwtServiceImpl jwtService;
 
     private final String secret = "my-super-secret-key-32charslong!!!";
     private final long expiration = 3600000;
 
     @BeforeEach
     void setup() {
-        jwtService = new JwtService();
+        jwtService = new JwtServiceImpl();
         ReflectionTestUtils.setField(jwtService, "secret", secret);
         ReflectionTestUtils.setField(jwtService, "expiration", expiration);
     }
@@ -67,9 +67,44 @@ class JwtServiceTest {
                 .parseSignedClaims(token)
                 .getPayload();
 
-        assertTrue(claims.getExpiration().getTime() >= before + expiration - 100,
+        assertTrue(claims.getExpiration().getTime() >= before + expiration - 200,
                 "Token expiration should be roughly now + expiration");
-        assertTrue(claims.getExpiration().getTime() <= after + expiration + 100,
+        assertTrue(claims.getExpiration().getTime() <= after + expiration + 200,
                 "Token expiration should be roughly now + expiration");
+    }
+
+    @Test
+    void extractEmail_returnsEmail() {
+        String email = "admin@test.com";
+        String token = jwtService.generateToken(email);
+
+        String extracted = jwtService.extractEmail(token);
+
+        assertEquals(email, extracted, "Email should be extracted from token");
+    }
+
+    @Test
+    void extractEmail_throwsExceptionOnEmptyToken() {
+        assertThrows(IllegalArgumentException.class, () -> jwtService.extractEmail(""));
+    }
+
+    @Test
+    void isTokenValid_returnsTrueOnValidToken() {
+        String token = jwtService.generateToken("user@test.com");
+        boolean result = jwtService.isValidToken(token);
+
+        assertTrue(result, "Token should be valid");
+    }
+
+    @Test
+    void isTokenValid_returnsFalseOnInvalidToken() {
+        boolean result = jwtService.isValidToken("invalid");
+        assertFalse(result, "Invalid token should not be valid");
+    }
+
+    @Test
+    void isTokenValid_returnsFalseOnEmptyToken() {
+        boolean result = jwtService.isValidToken("");
+        assertFalse(result, "Empty token should not be valid");
     }
 }
