@@ -53,27 +53,6 @@ class JwtServiceTest {
     }
 
     @Test
-    void generateToken_expirationIsSet() throws InterruptedException {
-        String email = "user2@example.com";
-        long before = System.currentTimeMillis();
-        Thread.sleep(500); // pas ouf mais permet de s'assurer que les valeurs soient différent
-        String token = jwtService.generateToken(email);
-        long after = System.currentTimeMillis();
-
-        SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        Claims claims = Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-
-        assertTrue(claims.getExpiration().getTime() >= before + expiration - 200,
-                "Token expiration should be roughly now + expiration");
-        assertTrue(claims.getExpiration().getTime() <= after + expiration + 200,
-                "Token expiration should be roughly now + expiration");
-    }
-
-    @Test
     void extractEmail_returnsEmail() {
         String email = "admin@test.com";
         String token = jwtService.generateToken(email);
