@@ -7,13 +7,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "cart_item",
-        uniqueConstraints = @UniqueConstraint(name = "uc_cart_user_product", columnNames = {"user_id", "product_id"}))
+@Table(name = "wishlist_item",
+        uniqueConstraints = @UniqueConstraint(name = "uc_wishlist_user_product", columnNames = {"user_id", "product_id"}))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CartItem {
+public class WishlistItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,9 +25,6 @@ public class CartItem {
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false, foreignKey = @ForeignKey(name = "fk_cartitem_product"))
     private Product product;
-
-    @Column(nullable = false)
-    private Integer quantity;
 
     @Column(nullable = false, name = "created_at")
     private Long createdAt;

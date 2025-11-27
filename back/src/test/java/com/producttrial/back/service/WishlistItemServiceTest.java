@@ -1,13 +1,13 @@
 package com.producttrial.back.service;
 
-import com.producttrial.back.dto.CartItemDTO;
-import com.producttrial.back.entity.CartItem;
+import com.producttrial.back.dto.WishlistItemDTO;
 import com.producttrial.back.entity.Product;
 import com.producttrial.back.entity.User;
-import com.producttrial.back.exception.CartItemNotFoundException;
+import com.producttrial.back.entity.WishlistItem;
 import com.producttrial.back.exception.ProductNotFoundException;
 import com.producttrial.back.exception.UserNotFoundException;
-import com.producttrial.back.repository.CartItemRepository;
+import com.producttrial.back.exception.WishlistItemNotFoundException;
+import com.producttrial.back.repository.WishlistItemRepository;
 import com.producttrial.back.service.iservice.IProductService;
 import com.producttrial.back.service.iservice.IUserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,20 +29,20 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class CartItemServiceTest {
+class WishlistItemServiceTest {
     @Mock
-    private CartItemRepository cartItemRepository;
+    private WishlistItemRepository wishlistItemRepository;
     @Mock
     private IUserService userService;
     @Mock
     private IProductService productService;
 
     @InjectMocks
-    private CartItemServiceImpl cartItemService;
+    private WishlistItemServiceImpl wishlistItemService;
 
     private User user;
     private Product product;
-    private CartItemDTO cartItemDTO;
+    private WishlistItemDTO wishlistItemDTO;
     Long itemId = 1L;
     Long userId = 1L;
 
@@ -63,41 +63,39 @@ class CartItemServiceTest {
                 .price(10.00D)
                 .build();
 
-        cartItemDTO = CartItemDTO.builder()
+        wishlistItemDTO = WishlistItemDTO.builder()
                 .productId(1L)
-                .quantity(2)
                 .build();
     }
     @Test
     void findByUserId_returnsListFromRepository() {
-        when(cartItemRepository.findByUserId(1L)).thenReturn(List.of(new CartItem(), new CartItem()));
+        when(wishlistItemRepository.findByUserId(1L)).thenReturn(List.of(new WishlistItem(), new WishlistItem()));
 
-        List<CartItem> result = cartItemRepository.findByUserId(1L);
+        List<WishlistItem> result = wishlistItemRepository.findByUserId(1L);
         assertEquals(2, result.size(), "list should contain 2 element");
     }
 
     @Test
-    void save_setsTimestampsAndReturnsSavedCartItem() {
+    void save_setsTimestampsAndReturnsSavedWishlistItem() {
         when(userService.findById(1L)).thenReturn(Optional.of(user));
         when(productService.findById(1L)).thenReturn(Optional.of(product));
-        when(cartItemRepository.findByUserIdAndProductId(1L, 1L)).thenReturn(Optional.empty());
-        when(cartItemRepository.save(any(CartItem.class))).thenAnswer(invocation -> {
-            CartItem c = invocation.getArgument(0);
-            c.setId(1L);
-            return c;
+        when(wishlistItemRepository.findByUserIdAndProductId(1L, 1L)).thenReturn(Optional.empty());
+        when(wishlistItemRepository.save(any(WishlistItem.class))).thenAnswer(invocation -> {
+            WishlistItem w = invocation.getArgument(0);
+            w.setId(1L);
+            return w;
         });
 
 
         // Pour vérifier que les timestamps sont dans le bon interval
         long before = System.currentTimeMillis();
-        CartItem saved = cartItemService.save(cartItemDTO, 1L);
+        WishlistItem saved = wishlistItemService.save(wishlistItemDTO, 1L);
         long after = System.currentTimeMillis();
 
         assertNotNull(saved.getId(), "id should not be null");
         assertEquals(1L, saved.getId(), "id should be 1");
         assertEquals("X", saved.getProduct().getName(), "name should be X");
         assertEquals("test@test.fr", saved.getUser().getEmail(),"email should be test@test.fr");
-        assertEquals(2, saved.getQuantity(), "quantity should be 2");
 
         assertNotNull(saved.getCreatedAt(), "createdAt should not be null");
         assertNotNull(saved.getUpdatedAt(), "updatedAt should not be null");
@@ -108,38 +106,29 @@ class CartItemServiceTest {
     }
 
     @Test
-    void save_updatesExistingCartItem(){
-        CartItem existingCartItem = CartItem.builder()
+    void save_throwsException_whenItemAlreadyExists() {
+        WishlistItem existingWishlistItem = WishlistItem.builder()
                 .id(1L)
                 .user(user)
                 .product(product)
-                .quantity(2)
                 .createdAt(System.currentTimeMillis())
                 .updatedAt(System.currentTimeMillis())
                 .build();
 
         when(userService.findById(1L)).thenReturn(Optional.of(user));
         when(productService.findById(1L)).thenReturn(Optional.of(product));
-        when(cartItemRepository.findByUserIdAndProductId(1L, 1L))
-                .thenReturn(Optional.of(existingCartItem));
-        when(cartItemRepository.save(any(CartItem.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(wishlistItemRepository.findByUserIdAndProductId(1L, 1L))
+                .thenReturn(Optional.of(existingWishlistItem));
 
-        CartItem saved = cartItemService.save(cartItemDTO, 1L);
-
-        assertNotNull(saved.getId(), "id should not be null");
-        assertEquals(1L, saved.getId(), "id should be 1");
-        assertEquals("X", saved.getProduct().getName(), "name should be X");
-        assertEquals("test@test.fr", saved.getUser().getEmail(), "email should be test@test.fr");
-        assertEquals(4, saved.getQuantity(), "quantity should be 4"); // 2 + 2
-
-        assertTrue(saved.getUpdatedAt() > saved.getCreatedAt(), "updated should be greater than created");
+        assertThrows(IllegalArgumentException.class, () -> wishlistItemService.save(wishlistItemDTO, 1L));
     }
+
 
     @Test
     void save_throwsUserNotFoundException_whenUserDoesNotExist() {
         when(userService.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> cartItemService.save(cartItemDTO, 1L));
+        assertThrows(UserNotFoundException.class, () -> wishlistItemService.save(wishlistItemDTO, 1L));
 
     }
 
@@ -148,65 +137,64 @@ class CartItemServiceTest {
         when(userService.findById(1L)).thenReturn(Optional.of(user));
         when(productService.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(ProductNotFoundException.class, () -> cartItemService.save(cartItemDTO, 1L));
+        assertThrows(ProductNotFoundException.class, () -> wishlistItemService.save(wishlistItemDTO, 1L));
     }
 
     @Test
     void delete_callsRepositoryDeleteById() {
-        when(cartItemRepository.existsByIdAndUserId(itemId, userId)).thenReturn(true);
+        when(wishlistItemRepository.existsByIdAndUserId(itemId, userId)).thenReturn(true);
 
-        cartItemService.delete(1L, 1L);
+        wishlistItemService.delete(1L, 1L);
 
-        verify(cartItemRepository).deleteById(1L);
+        verify(wishlistItemRepository).deleteById(1L);
     }
 
     @Test
     void delete_throwsException_whenItemDoesNotExist() {
-        when(cartItemRepository.existsByIdAndUserId(itemId, userId)).thenReturn(false);
+        when(wishlistItemRepository.existsByIdAndUserId(itemId, userId)).thenReturn(false);
 
-        assertThrows(CartItemNotFoundException.class, () -> cartItemService.delete(itemId, userId));
-        verify(cartItemRepository, never()).deleteById(any());
+        assertThrows(WishlistItemNotFoundException.class, () -> wishlistItemService.delete(itemId, userId));
+        verify(wishlistItemRepository, never()).deleteById(any());
     }
 
     @Test
     void deleteAll_callsRepositoryDeleteAll() {
-        cartItemService.deleteAll();
-        verify(cartItemRepository).deleteAll();
+        wishlistItemService.deleteAll();
+        verify(wishlistItemRepository).deleteAll();
     }
 
     @Test
-    void getCart_returnsMappedPage() {
+    void getWishlist_returnsMappedPage() {
         Pageable pageable = PageRequest.of(0, 10);
 
-        CartItem item = CartItem.builder().id(1L).build();
-        Page<CartItem> page = new PageImpl<>(List.of(item));
+        WishlistItem wishlistItem = WishlistItem.builder().id(1L).build();
+        Page<WishlistItem> page = new PageImpl<>(List.of(wishlistItem));
 
-        when(cartItemRepository.findByUserId(pageable, userId)).thenReturn(page);
+        when(wishlistItemRepository.findByUserId(pageable, userId)).thenReturn(page);
 
-        Page<CartItemDTO> result = cartItemService.getCart(pageable, userId);
+        Page<WishlistItemDTO> result = wishlistItemService.getWishlist(pageable, userId);
 
         assertEquals(1, result.getTotalElements());
-        assertEquals(item.getId(), result.getContent().getFirst().getId());
+        assertEquals(wishlistItem.getId(), result.getContent().getFirst().getId());
     }
 
     @Test
-    void getCartItemById_returnsMappedDto_whenItemExists() {
-        CartItem item = CartItem.builder().id(itemId).build();
-        when(cartItemRepository.findByIdAndUserId(itemId, userId)).thenReturn(Optional.of(item));
+    void getWishlistItemById_returnsMappedDto_whenItemExists() {
+        WishlistItem item = WishlistItem.builder().id(itemId).build();
+        when(wishlistItemRepository.findByIdAndUserId(itemId, userId)).thenReturn(Optional.of(item));
 
-        Optional<CartItemDTO> dto = cartItemService.getCartItemById(itemId, userId);
+        Optional<WishlistItemDTO> dto = wishlistItemService.getWishlistItemById(itemId, userId);
 
         assertTrue(dto.isPresent());
         assertEquals(itemId, dto.get().getId());
     }
 
     @Test
-    void getCartItemById_returnsEmpty_whenItemDoesNotExist() {
-        when(cartItemRepository.findByIdAndUserId(itemId, userId)).thenReturn(Optional.empty());
+    void getWishlistItemById_returnsEmpty_whenItemDoesNotExist() {
+        when(wishlistItemRepository.findByIdAndUserId(itemId, userId)).thenReturn(Optional.empty());
 
-        Optional<CartItemDTO> dto = cartItemService.getCartItemById(itemId, userId);
+        Optional<WishlistItemDTO> dto = wishlistItemService.getWishlistItemById(itemId, userId);
 
         assertTrue(dto.isEmpty());
     }
-
 }

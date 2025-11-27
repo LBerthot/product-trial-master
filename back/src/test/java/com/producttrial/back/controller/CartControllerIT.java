@@ -23,13 +23,12 @@ import tools.jackson.databind.ObjectMapper;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @Import(GlobalExceptionHandler.class)
-class CartItemControllerIT {
+class CartControllerIT {
     @Autowired
     private WebApplicationContext wac;
 
@@ -78,20 +77,21 @@ class CartItemControllerIT {
         userRepository.deleteAll();
         cartItemRepository.deleteAll();
 
+        Long now = System.currentTimeMillis();
         product1 = Product.builder()
                 .name("Produit A")
                 .code("C1")
                 .price(10.00D)
-                .createdAt(System.currentTimeMillis())
-                .updatedAt(System.currentTimeMillis())
+                .createdAt(now)
+                .updatedAt(now)
                 .build();
         product1 = productRepository.save(product1);
         product2 = Product.builder()
                 .name("Produit B")
                 .code("C2")
                 .price(10.00D)
-                .createdAt(System.currentTimeMillis())
-                .updatedAt(System.currentTimeMillis())
+                .createdAt(now)
+                .updatedAt(now)
                 .build();
         product2 = productRepository.save(product2);
         User user = User.builder()
@@ -104,8 +104,8 @@ class CartItemControllerIT {
         cartItem = CartItem.builder()
                 .user(user)
                 .product(product1)
-                .createdAt(System.currentTimeMillis())
-                .updatedAt(System.currentTimeMillis())
+                .createdAt(now)
+                .updatedAt(now)
                 .quantity(2)
                 .build();
         cartItem = cartItemRepository.save(cartItem);
@@ -157,7 +157,7 @@ class CartItemControllerIT {
     }
 
     @Test
-    void getProduct_returnProduct_Unauthorized() throws Exception {
+    void getWishlistItem_returnWishlistItem_Unauthorized() throws Exception {
         mockMvc.perform(get("/cart/10")
                         .header("Authorization", "Bearer ")
                         .accept(MediaType.APPLICATION_JSON))
@@ -220,7 +220,7 @@ class CartItemControllerIT {
     }
 
     @Test
-    void createProduct_returnsUnauthorized() throws Exception {
+    void createCartItem_returnsUnauthorized() throws Exception {
         CartItemDTO cartItemDTO = CartItemDTO.builder()
                 .productId(product1.getId())
                 .quantity(2)
@@ -236,7 +236,7 @@ class CartItemControllerIT {
     }
 
     @Test
-    void deleteProduct_returnsNoContent() throws Exception {
+    void deleteCartItem_returnsNoContent() throws Exception {
         String token = obtainToken();
         mockMvc.perform(delete("/cart/{id}", cartItem.getId())
                         .header("Authorization", "Bearer " + token))
@@ -244,21 +244,20 @@ class CartItemControllerIT {
     }
 
     @Test
-    void deleteProduct_returnsNotFound() throws Exception {
+    void deleteCartItem_returnsNotFound() throws Exception {
         String token = obtainToken();
-        mockMvc.perform(delete("/cart/{id}", 10L)
+        mockMvc.perform(delete("/cart/{id}", 100L)
                         .header("Authorization", "Bearer " + token))
-                .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.error").value("Not Found"))
-                .andExpect(jsonPath("$.message").value("Cart item with id 10 not found"))
-                .andExpect(jsonPath("$.path").value("/cart/10"));
+                .andExpect(jsonPath("$.message").value("Cart item with id 100 not found"))
+                .andExpect(jsonPath("$.path").value("/cart/100"));
     }
 
     @Test
-    void deleteProduct_returnsUnauthorized() throws Exception {
-        mockMvc.perform(delete("/products/{id}", cartItem.getId())
+    void deleteCartItem_returnsUnauthorized() throws Exception {
+        mockMvc.perform(delete("/cart/{id}", cartItem.getId())
                         .header("Authorization", "Bearer "))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.status").value(401));

@@ -1,6 +1,6 @@
 package com.producttrial.back.security;
 
-import com.producttrial.back.service.IJwtService;
+import com.producttrial.back.service.iservice.IJwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

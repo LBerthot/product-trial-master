@@ -1,4 +1,4 @@
-package com.producttrial.back.service;
+package com.producttrial.back.service.iservice;
 
 import com.producttrial.back.dto.CartItemDTO;
 import com.producttrial.back.entity.CartItem;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ICartItemService {
-    // Méthodes de Product
+    // Méthodes de cartItem
 
     /**
      * Retrieves a list of cart items associated with a specific user ID.
@@ -42,7 +42,7 @@ public interface ICartItemService {
      */
     void deleteAll();
 
-    // Méthode de ProductDTO
+    // Méthode de cartItemDTO
 
     /**
      * Retrieves a paginated list of cart items associated with a specific user ID.

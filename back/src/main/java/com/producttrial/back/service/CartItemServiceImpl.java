@@ -9,7 +9,9 @@ import com.producttrial.back.exception.ProductNotFoundException;
 import com.producttrial.back.exception.UserNotFoundException;
 import com.producttrial.back.mapper.CartItemMapper;
 import com.producttrial.back.repository.CartItemRepository;
-import jakarta.persistence.EntityManager;
+import com.producttrial.back.service.iservice.ICartItemService;
+import com.producttrial.back.service.iservice.IProductService;
+import com.producttrial.back.service.iservice.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -26,7 +28,6 @@ public class CartItemServiceImpl implements ICartItemService{
     private final CartItemRepository cartItemRepository;
     private final IUserService userService;
     private final IProductService productService;
-    private final EntityManager entityManager;
 
     // Méthode de CartItem
 
@@ -79,7 +80,7 @@ public class CartItemServiceImpl implements ICartItemService{
             cartItemRepository.deleteById(id);
             log.info("Deleted cart item id={}", id);
         } catch (Exception e) {
-            log.error("Error deleting product id={}", id, e);
+            log.error("Error deleting cart item id={}", id, e);
             throw e;
         }
     }

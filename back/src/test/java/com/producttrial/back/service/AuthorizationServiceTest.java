@@ -1,6 +1,7 @@
 package com.producttrial.back.service;
 
 import com.producttrial.back.entity.User;
+import com.producttrial.back.service.iservice.IUserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

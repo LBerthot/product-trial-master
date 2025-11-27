@@ -5,6 +5,7 @@ import com.producttrial.back.entity.Product;
 import com.producttrial.back.exception.ProductNotFoundException;
 import com.producttrial.back.mapper.ProductMapper;
 import com.producttrial.back.repository.ProductRepository;
+import com.producttrial.back.service.iservice.IProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
