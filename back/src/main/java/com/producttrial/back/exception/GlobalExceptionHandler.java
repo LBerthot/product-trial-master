@@ -23,18 +23,6 @@ import java.util.Map;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    // 404 pour ProductNotFoundException
-    @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFound(ProductNotFoundException ex, HttpServletRequest req) {
-        log.warn("NotFound: {}", ex.getMessage());
-        ErrorResponse body = new ErrorResponse(Instant.now(),
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                ex.getMessage(),
-                req.getRequestURI());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
-    }
-
     // 400 pour @Valid on @RequestBody (ex: @NotBlank fail)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest req) {
@@ -81,16 +69,70 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
     }
 
-    // 409 pour violation de contrainte DB (doublon, not null non géré, etc.)
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProductNotFound(ProductNotFoundException ex, HttpServletRequest req) {
+        return buildNotFoundResponse(ex.getMessage(), req.getRequestURI());
+    }
+
+    @ExceptionHandler(CartItemNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleCartItemNotFound(CartItemNotFoundException ex, HttpServletRequest req) {
+        return buildNotFoundResponse(ex.getMessage(), req.getRequestURI());
+    }
+
+    @ExceptionHandler(WishlistItemNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleWishlistItemNotFound(WishlistItemNotFoundException ex, HttpServletRequest req) {
+        return buildNotFoundResponse(ex.getMessage(), req.getRequestURI());
+    }
+
+    // 404 pour NotFoundException
+    private ResponseEntity<ErrorResponse> buildNotFoundResponse(String message, String path) {
+        ErrorResponse body = new ErrorResponse(
+                Instant.now(),
+                404,
+                "Not Found",
+                message,
+                path
+        );
+        return ResponseEntity.status(404).body(body);
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrity(DataIntegrityViolationException ex, HttpServletRequest req) {
         log.error("Data integrity violation: {}", ex.getMessage(), ex);
-        String detail = optionalMessageFromDataIntegrity(ex);
-        ErrorResponse body = new ErrorResponse(Instant.now(),
+        Throwable root = ex.getRootCause();
+        String detail;
+        if (root != null && root.getMessage() != null) {
+            detail = root.getMessage();
+        } else {
+            detail = ex.getMessage() != null ? ex.getMessage() : "Data integrity violation";
+        }
+
+        return buildConflictResponse(detail, req.getRequestURI());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest req) {
+        log.warn("Illegal argument: {}", ex.getMessage(), ex);
+        Throwable root = ex.getCause();
+        String detail;
+        if (root != null && root.getMessage() != null) {
+            detail = root.getMessage();
+        } else {
+            detail = ex.getMessage() != null ? ex.getMessage() : "Invalid argument";
+        }
+
+        return buildConflictResponse(detail, req.getRequestURI());
+    }
+
+    // 409 pour conflict exception
+    private ResponseEntity<ErrorResponse> buildConflictResponse(String message, String path) {
+        ErrorResponse body = new ErrorResponse(
+                Instant.now(),
                 HttpStatus.CONFLICT.value(),
                 HttpStatus.CONFLICT.getReasonPhrase(),
-                detail,
-                req.getRequestURI());
+                message,
+                path
+        );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
@@ -126,12 +168,5 @@ public class GlobalExceptionHandler {
                 "Unexpected error",
                 req.getRequestURI());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
-    }
-
-    private String optionalMessageFromDataIntegrity(DataIntegrityViolationException ex) {
-        if (ex.getMostSpecificCause().getMessage() != null) {
-            return ex.getMostSpecificCause().getMessage();
-        }
-        return "Database constraint violation";
     }
 }

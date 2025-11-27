@@ -3,8 +3,8 @@ package com.producttrial.back.controller;
 import com.producttrial.back.dto.AuthRequestDTO;
 import com.producttrial.back.dto.AuthResponseDTO;
 import com.producttrial.back.entity.User;
-import com.producttrial.back.service.IJwtService;
-import com.producttrial.back.service.IUserService;
+import com.producttrial.back.service.iservice.IJwtService;
+import com.producttrial.back.service.iservice.IUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,7 @@ public class AuthController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
 
-        String token = jwtService.generateToken(user.getEmail());
+        String token = jwtService.generateToken(user.getId());
 
         return ResponseEntity.ok(new AuthResponseDTO(token));
     }

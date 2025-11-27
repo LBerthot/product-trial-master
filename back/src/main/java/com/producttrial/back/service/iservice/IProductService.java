@@ -1,4 +1,4 @@
-package com.producttrial.back.service;
+package com.producttrial.back.service.iservice;
 
 import com.producttrial.back.dto.ProductDTO;
 import com.producttrial.back.entity.Product;

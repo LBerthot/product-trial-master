@@ -30,17 +30,17 @@ class JwtServiceTest {
 
     @Test
     void generateToken_returnsToken() {
-        String email = "test@test.fr";
-        String token = jwtService.generateToken(email);
+        Long userId = 1L;
+        String token = jwtService.generateToken(userId);
 
         assertNotNull(token, "Token should not be null");
         assertFalse(token.isEmpty(), "Token should not be empty");
     }
 
     @Test
-    void generateToken_containsEmail() {
-        String email = "test@test.fr";
-        String token = jwtService.generateToken(email);
+    void generateToken_containsUserId() {
+        Long userId = 1L;
+        String token = jwtService.generateToken(userId);
 
         SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         Claims claims = Jwts.parser()
@@ -49,27 +49,27 @@ class JwtServiceTest {
                 .parseSignedClaims(token)
                 .getPayload();
 
-        assertEquals(email, claims.getSubject(), "Token subject should be the email");
+        assertEquals(String.valueOf(userId), claims.getSubject(), "Token subject should be userId");
     }
 
     @Test
-    void extractEmail_returnsEmail() {
-        String email = "admin@test.com";
-        String token = jwtService.generateToken(email);
+    void extractEmail_returnsUserId() {
+        Long userId = 1L;
+        String token = jwtService.generateToken(userId);
 
-        String extracted = jwtService.extractEmail(token);
+        String extracted = jwtService.extractUserId(token);
 
-        assertEquals(email, extracted, "Email should be extracted from token");
+        assertEquals(String.valueOf(userId), extracted, "User id should be extracted from token");
     }
 
     @Test
     void extractEmail_throwsExceptionOnEmptyToken() {
-        assertThrows(IllegalArgumentException.class, () -> jwtService.extractEmail(""));
+        assertThrows(IllegalArgumentException.class, () -> jwtService.extractUserId(""));
     }
 
     @Test
     void isTokenValid_returnsTrueOnValidToken() {
-        String token = jwtService.generateToken("user@test.com");
+        String token = jwtService.generateToken(1L);
         boolean result = jwtService.isValidToken(token);
 
         assertTrue(result, "Token should be valid");

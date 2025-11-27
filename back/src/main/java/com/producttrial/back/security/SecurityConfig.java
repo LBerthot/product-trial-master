@@ -1,6 +1,6 @@
 package com.producttrial.back.security;
 
-import com.producttrial.back.service.IJwtService;
+import com.producttrial.back.service.iservice.IJwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;

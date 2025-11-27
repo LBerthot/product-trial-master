@@ -3,6 +3,7 @@ package com.producttrial.back.service;
 import com.producttrial.back.entity.User;
 import com.producttrial.back.exception.UserNotFoundException;
 import com.producttrial.back.repository.UserRepository;
+import com.producttrial.back.service.iservice.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,13 +39,6 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public User save(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("Email already used");
-        }
-        if (userRepository.existsByUsername(user.getUsername())) {
-            throw new IllegalArgumentException("Username already used");
-        }
-
         try {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             User saved = userRepository.save(user);

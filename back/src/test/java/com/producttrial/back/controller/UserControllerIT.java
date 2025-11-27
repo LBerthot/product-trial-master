@@ -100,7 +100,7 @@ class UserControllerIT {
                 .email("")
                 .username("test2")
                 .firstname("Test2")
-                .password("test")
+                .password("testfdgdfgdfgd")
                 .build();
 
         mockMvc.perform(post("/account")
