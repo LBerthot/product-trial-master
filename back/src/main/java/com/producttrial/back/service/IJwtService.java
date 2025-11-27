@@ -4,17 +4,19 @@ public interface IJwtService {
     /**
      * Generates a JWT (JSON Web Token) for the given email address.
      *
-     * @param email the email address for which the token is to be generated
+     * @param userId the user id for which the token is to be generated
      * @return a JWT string representing the token
      */
-    String generateToken(String email);
+    String generateToken(Long userId);
+
     /**
-     * Extracts the email address from a given JSON Web Token (JWT).
+     * Extracts the user ID from the given JWT token.
      *
-     * @param token the JWT from which the email address is extracted
-     * @return the email address contained within the token
+     * @param token the JWT token from which the user ID is to be extracted
+     * @return the user ID extracted from the token as a string
      */
-    String extractEmail(String token);
+    String extractUserId(String token);
+
     /**
      * Validates the provided token to check if it is correctly signed and not expired.
      *

@@ -23,18 +23,6 @@ import java.util.Map;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    // 404 pour ProductNotFoundException
-    @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFound(ProductNotFoundException ex, HttpServletRequest req) {
-        log.warn("NotFound: {}", ex.getMessage());
-        ErrorResponse body = new ErrorResponse(Instant.now(),
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                ex.getMessage(),
-                req.getRequestURI());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
-    }
-
     // 400 pour @Valid on @RequestBody (ex: @NotBlank fail)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest req) {
@@ -79,6 +67,28 @@ public class GlobalExceptionHandler {
                 req.getRequestURI()
         );
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
+    }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProductNotFound(ProductNotFoundException ex, HttpServletRequest req) {
+        return buildNotFoundResponse(ex.getMessage(), req.getRequestURI());
+    }
+
+    @ExceptionHandler(CartItemNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleCartItemNotFound(CartItemNotFoundException ex, HttpServletRequest req) {
+        return buildNotFoundResponse(ex.getMessage(), req.getRequestURI());
+    }
+
+    // 404 pour NotFoundException
+    private ResponseEntity<ErrorResponse> buildNotFoundResponse(String message, String path) {
+        ErrorResponse body = new ErrorResponse(
+                Instant.now(),
+                404,
+                "Not Found",
+                message,
+                path
+        );
+        return ResponseEntity.status(404).body(body);
     }
 
     // 409 pour violation de contrainte DB (doublon, not null non géré, etc.)

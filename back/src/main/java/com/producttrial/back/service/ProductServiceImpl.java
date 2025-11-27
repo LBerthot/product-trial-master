@@ -99,14 +99,11 @@ public class ProductServiceImpl implements IProductService{
 
     @Override
     public Page<ProductDTO> getAllProducts(Pageable pageable) {
-        return productRepository
-                .findAll(pageable)
-                .map(ProductMapper::toDto);
+        return productRepository.findAll(pageable).map(ProductMapper::toDto);
     }
 
     @Override
     public Optional<ProductDTO> getProductById(Long id) {
-        return productRepository.findById(id)
-                .map(ProductMapper::toDto);
+        return productRepository.findById(id).map(ProductMapper::toDto);
     }
 }

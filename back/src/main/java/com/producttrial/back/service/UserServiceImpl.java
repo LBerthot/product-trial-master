@@ -38,13 +38,6 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public User save(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("Email already used");
-        }
-        if (userRepository.existsByUsername(user.getUsername())) {
-            throw new IllegalArgumentException("Username already used");
-        }
-
         try {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             User saved = userRepository.save(user);

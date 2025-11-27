@@ -21,6 +21,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -49,7 +50,7 @@ class ProductControllerIT {
     private User admin;
     private User user1;
 
-    private String obtainAdminToken(String email) throws Exception {
+    private String obtainToken(String email) throws Exception {
         AuthRequestDTO authRequestDTO = AuthRequestDTO.builder()
                 .email(email)
                 .password("Mdp!1234")
@@ -109,7 +110,7 @@ class ProductControllerIT {
 
     @Test
     void getAllProducts_returnsAllProducts() throws Exception {
-        String token = obtainAdminToken(admin.getEmail());
+        String token = obtainToken(admin.getEmail());
         mockMvc.perform(get("/products")
                         .header("Authorization", "Bearer " + token)
                         .accept(MediaType.APPLICATION_JSON))
@@ -121,7 +122,7 @@ class ProductControllerIT {
 
     @Test
     void getAllProducts_withPagination_pageSize1() throws Exception {
-        String token = obtainAdminToken(admin.getEmail());
+        String token = obtainToken(admin.getEmail());
         mockMvc.perform(get("/products")
                         .param("page", "0")
                         .param("size", "1")
@@ -135,7 +136,7 @@ class ProductControllerIT {
 
     @Test
     void getAllProducts_sizeTooLarge_returnsBadRequest() throws Exception {
-        String token = obtainAdminToken(admin.getEmail());
+        String token = obtainToken(admin.getEmail());
         mockMvc.perform(get("/products")
                         .param("page", "0")
                         .param("size", "500")
@@ -154,7 +155,7 @@ class ProductControllerIT {
 
     @Test
     void getProduct_returnProduct() throws Exception {
-        String token = obtainAdminToken(admin.getEmail());
+        String token = obtainToken(admin.getEmail());
         mockMvc.perform(get("/products/{id}", product1.getId())
                         .header("Authorization", "Bearer " + token)
                         .accept(MediaType.APPLICATION_JSON))
@@ -165,7 +166,7 @@ class ProductControllerIT {
     }
     @Test
     void getProduct_returnNotFound() throws Exception {
-        String token = obtainAdminToken(admin.getEmail());
+        String token = obtainToken(admin.getEmail());
         mockMvc.perform(get("/products/10")
                         .header("Authorization", "Bearer " + token)
                         .accept(MediaType.APPLICATION_JSON))
@@ -184,7 +185,7 @@ class ProductControllerIT {
 
     @Test
     void createProduct_returnsCreatedProduct() throws Exception {
-        String token = obtainAdminToken(admin.getEmail());
+        String token = obtainToken(admin.getEmail());
         ProductDTO productCreateDTO = ProductDTO.builder()
                 .name("X2")
                 .code("C3")
@@ -204,7 +205,7 @@ class ProductControllerIT {
 
     @Test
     void createProduct_returnsBadRequest() throws Exception {
-        String token = obtainAdminToken(admin.getEmail());
+        String token = obtainToken(admin.getEmail());
         ProductDTO productCreateDTO = ProductDTO.builder()
                 .name("X2")
                 .price(-10.00D)
@@ -240,7 +241,7 @@ class ProductControllerIT {
 
     @Test
     void createProduct_returnsForbidden() throws Exception {
-        String token = obtainAdminToken(user1.getEmail());
+        String token = obtainToken(user1.getEmail());
         ProductDTO productCreateDTO = ProductDTO.builder()
                 .name("X2")
                 .code("C3")
@@ -257,7 +258,7 @@ class ProductControllerIT {
 
     @Test
     void updateProduct_returnsUpdatedProduct() throws Exception {
-        String token = obtainAdminToken(admin.getEmail());
+        String token = obtainToken(admin.getEmail());
         ProductDTO productUpdateDTO = ProductDTO.builder()
                 .id(product1.getId())
                 .name("X2")
@@ -278,7 +279,7 @@ class ProductControllerIT {
 
     @Test
     void updateProduct_returnsNotFound() throws Exception {
-        String token = obtainAdminToken(admin.getEmail());
+        String token = obtainToken(admin.getEmail());
         ProductDTO productUpdateDTO = ProductDTO.builder()
                 .id(10L)
                 .name("X2")
@@ -314,7 +315,7 @@ class ProductControllerIT {
 
     @Test
     void updateProduct_returnForbidden() throws Exception {
-        String token = obtainAdminToken(user1.getEmail());
+        String token = obtainToken(user1.getEmail());
         ProductDTO productUpdateDTO = ProductDTO.builder()
                 .id(product1.getId())
                 .name("X2")
@@ -332,7 +333,7 @@ class ProductControllerIT {
 
     @Test
     void deleteProduct_returnsNoContent() throws Exception {
-        String token = obtainAdminToken(admin.getEmail());
+        String token = obtainToken(admin.getEmail());
         mockMvc.perform(delete("/products/{id}", product1.getId())
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNoContent());
@@ -340,9 +341,10 @@ class ProductControllerIT {
 
     @Test
     void deleteProduct_returnsNotFound() throws Exception {
-        String token = obtainAdminToken(admin.getEmail());
+        String token = obtainToken(admin.getEmail());
         mockMvc.perform(delete("/products/{id}", 10L)
                         .header("Authorization", "Bearer " + token))
+                .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.error").value("Not Found"))
@@ -360,7 +362,7 @@ class ProductControllerIT {
 
     @Test
     void deleteProduct_returnsForbidden() throws Exception {
-        String token = obtainAdminToken(user1.getEmail());
+        String token = obtainToken(user1.getEmail());
         mockMvc.perform(delete("/products/{id}", product1.getId())
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isForbidden())

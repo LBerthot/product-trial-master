@@ -20,4 +20,12 @@ public interface IAuthorizationService {
      * that should only be available to administrative users.
      */
     void ensureAdmin();
+
+    /**
+     * Retrieves the unique identifier of the currently authenticated user.
+     *
+     * @return a Long representing the user ID of the current user,
+     *         or null if no user is authenticated.
+     */
+    Long getCurrentUserId();
 }
