@@ -1,6 +1,5 @@
 package com.producttrial.back.dto;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -18,14 +17,12 @@ public class UserCreateDTO {
     private Long id;
 
     @NotBlank(message = "Username is required")
-    @Column(unique = true)
     private String username;
 
     private String firstname;
 
     @Email(message = "Invalid email address")
     @NotBlank(message = "Email is required")
-    @Column(unique = true)
     private String email;
 
     @NotBlank(message = "Password is required")

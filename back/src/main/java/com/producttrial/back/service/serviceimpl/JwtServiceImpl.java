@@ -1,6 +1,6 @@
-package com.producttrial.back.service;
+package com.producttrial.back.service.serviceimpl;
 
-import com.producttrial.back.service.iservice.IJwtService;
+import com.producttrial.back.service.IJwtService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;

@@ -4,7 +4,7 @@ import com.producttrial.back.dto.UserCreateDTO;
 import com.producttrial.back.dto.UserResponseDTO;
 import com.producttrial.back.entity.User;
 import com.producttrial.back.mapper.UserMapper;
-import com.producttrial.back.service.iservice.IUserService;
+import com.producttrial.back.service.IUserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.extern.slf4j.Slf4j;

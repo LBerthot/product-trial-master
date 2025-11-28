@@ -2,6 +2,7 @@ package com.producttrial.back.service;
 
 import com.producttrial.back.entity.User;
 import com.producttrial.back.repository.UserRepository;
+import com.producttrial.back.service.serviceimpl.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
