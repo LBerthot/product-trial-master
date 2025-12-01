@@ -19,11 +19,11 @@ public class WishlistItem {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_cartitem_user"))
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false, foreignKey = @ForeignKey(name = "fk_cartitem_product"))
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
     @Column(nullable = false, name = "created_at")
