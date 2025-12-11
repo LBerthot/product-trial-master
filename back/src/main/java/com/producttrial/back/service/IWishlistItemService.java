@@ -1,4 +1,4 @@
-package com.producttrial.back.service.iservice;
+package com.producttrial.back.service;
 
 import com.producttrial.back.dto.WishlistItemDTO;
 import com.producttrial.back.entity.WishlistItem;

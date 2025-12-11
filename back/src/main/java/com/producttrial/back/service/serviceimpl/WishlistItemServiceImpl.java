@@ -1,4 +1,4 @@
-package com.producttrial.back.service;
+package com.producttrial.back.service.serviceimpl;
 
 import com.producttrial.back.dto.WishlistItemDTO;
 import com.producttrial.back.entity.Product;
@@ -9,9 +9,9 @@ import com.producttrial.back.exception.UserNotFoundException;
 import com.producttrial.back.exception.WishlistItemNotFoundException;
 import com.producttrial.back.mapper.WishlistItemMapper;
 import com.producttrial.back.repository.WishlistItemRepository;
-import com.producttrial.back.service.iservice.IProductService;
-import com.producttrial.back.service.iservice.IUserService;
-import com.producttrial.back.service.iservice.IWishlistItemService;
+import com.producttrial.back.service.IProductService;
+import com.producttrial.back.service.IUserService;
+import com.producttrial.back.service.IWishlistItemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

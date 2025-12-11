@@ -1,9 +1,9 @@
-package com.producttrial.back.service;
+package com.producttrial.back.service.serviceimpl;
 
 import com.producttrial.back.entity.User;
 import com.producttrial.back.exception.UserNotFoundException;
 import com.producttrial.back.repository.UserRepository;
-import com.producttrial.back.service.iservice.IUserService;
+import com.producttrial.back.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;

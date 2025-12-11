@@ -1,4 +1,4 @@
-package com.producttrial.back.service;
+package com.producttrial.back.service.serviceimpl;
 
 import com.producttrial.back.dto.CartItemDTO;
 import com.producttrial.back.entity.CartItem;
@@ -9,9 +9,9 @@ import com.producttrial.back.exception.ProductNotFoundException;
 import com.producttrial.back.exception.UserNotFoundException;
 import com.producttrial.back.mapper.CartItemMapper;
 import com.producttrial.back.repository.CartItemRepository;
-import com.producttrial.back.service.iservice.ICartItemService;
-import com.producttrial.back.service.iservice.IProductService;
-import com.producttrial.back.service.iservice.IUserService;
+import com.producttrial.back.service.ICartItemService;
+import com.producttrial.back.service.IProductService;
+import com.producttrial.back.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -24,7 +24,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CartItemServiceImpl implements ICartItemService{
+public class CartItemServiceImpl implements ICartItemService {
     private final CartItemRepository cartItemRepository;
     private final IUserService userService;
     private final IProductService productService;

@@ -1,4 +1,4 @@
-package com.producttrial.back.service.iservice;
+package com.producttrial.back.service;
 
 public interface IJwtService {
     /**
