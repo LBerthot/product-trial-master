@@ -16,14 +16,8 @@ Dans ce mode, ni PostgreSQL ni Java/Maven n’ont besoin d’être installés su
 
 Avant de lancer le projet, copier le fichier `.env.example` situé à la racine en `.env` :
 
-```bash
-cp .env.example .env
-```
-
-Sous Windows PowerShell :
-
 ```powershell
-Copy-Item .env.example .env
+cp .env.example .env
 ```
 
 Les valeurs par défaut conviennent pour un usage de test/local.
