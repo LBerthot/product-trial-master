@@ -1,0 +1,49 @@
+services:
+  db:
+    image: postgres:15
+    container_name: producttrial_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-producttrial}
+      POSTGRES_USER: ${DB_USER:-producttrial_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-producttrial_pass}
+    volumes:
+      - producttrial_pgdata:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-producttrial_user} -d ${DB_NAME:-producttrial}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+    networks:
+      - productnet
+
+  app:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    container_name: producttrial_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:${DB_PORT:-5432}/${DB_NAME:-producttrial}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER:-producttrial_user}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-producttrial_pass}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      JAVA_OPTS: ${JAVA_OPTS:-}
+    ports:
+      - "8080:8080"
+    networks:
+      - productnet
+
+volumes:
+  producttrial_pgdata:
+
+networks:
+  productnet:
+    driver: bridge
+    name: producttrial_productnet

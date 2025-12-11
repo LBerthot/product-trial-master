@@ -6,59 +6,102 @@ Ce projet est un exercice pour gérer un backend de produits et wishlist. Il con
 
 - Backend Spring Boot (back/)
 - Requêtes Postman pour tester les endpoints (dans le dossier postman/)
-- Deux branches principales :
-  - main : simulation complète avec H2 
-  - bdd-docker : utilisation d’une vraie base PostgreSQL (docker non implémenté)
+- Utilisation d’une vraie base PostgreSQL via Docker (base en conteneur, données persistantes)
 
-## Lancement du projet
+## Lancement du projet avec Docker
 
-### 1. Utiliser la simulation avec H2 (branche main)
-Cette branche ne nécessite aucune configuration de base de données. Idéal pour tester rapidement le projet.
+Dans ce mode, ni PostgreSQL ni Java/Maven n’ont besoin d’être installés sur la machine cible : Docker se charge de tout via `docker-compose.yml`.
 
-``` powershell à partir de la racine du projet
-cd .\back\
-./mvnw spring-boot:run
+### 0. Préparation du fichier .env
+
+Avant de lancer le projet, copier le fichier `.env.example` situé à la racine en `.env` :
+
+```bash
+cp .env.example .env
 ```
 
-- L’application démarre avec une BDD en mémoire H2. 
-- Les données sont temporaires et seront perdues à l’arrêt de l’application. 
-- Toutes les fonctionnalités peuvent être testées via Postman en important les json présent dans le dossier postman/.
+Sous Windows PowerShell :
 
-
-### 2. Utiliser une vraie base PostgreSQL (branche bdd-docker)
-
-Cette branche est connectée à PostgreSQL. Elle nécessite un utilisateur et une base PostgreSQL existants.
-
-Étapes :
-- Créer la base (si nécessaire)
-``` dans dbeaver par exemple
-CREATE DATABASE producttrial;
-```
-- Créer l’utilisateur (si nécessaire)
-``` dans dbeaver par exemple
-CREATE USER producttrial_user WITH PASSWORD 'NouveauMotDePasseTest';
-GRANT ALL PRIVILEGES ON DATABASE producttrial TO producttrial_user;
-```
-- Lancer l’application sur powerShell (ou le terminal de IntelliJ)
-``` powershell
-cd .\back\
-$Env:DB_USER="producttrial_user"
-$Env:DB_PASSWORD="NouveauMotDePasseTest"
-./mvnw spring-boot:run
+```powershell
+Copy-Item .env.example .env
 ```
 
-L'application se connectera sur la bdd et les données seront persistantes.
+Les valeurs par défaut conviennent pour un usage de test/local.
+
+### 1. Prérequis
+
+- **Windows**
+  - Installer **Docker Desktop** depuis le site officiel
+  - S’assurer que Docker Desktop est lancé et que le moteur **Linux containers** est actif
+
+- **macOS**
+  - Installer **Docker Desktop for Mac**
+  - Lancer Docker Desktop avant d’exécuter les commandes
+
+- **Linux**
+  - Installer Docker Engine et Docker Compose (ou le plugin `docker compose`)
+  - Vérifier que l’utilisateur a les droits suffisants (groupe `docker` si nécessaire)
+
+### 2. Lancer l’environnement complet (API + PostgreSQL en conteneur)
+
+À partir de la racine du projet :
+
+```bash
+docker compose up -d --build
+```
+
+Cette commande :
+
+- construit l’image du backend à partir de `back/Dockerfile` ;
+- télécharge et démarre un conteneur PostgreSQL `producttrial_db` (image `postgres:15`) ;
+- crée un volume Docker `producttrial_pgdata` pour persister les données ;
+- met les deux conteneurs sur le même réseau Docker ;
+- expose l’API backend sur `http://localhost:8080`.
+
+Une fois la commande terminée, l’API est accessible via :
+
+- navigateur : `http://localhost:8080`
+- Postman : `GET`/`POST` sur `http://localhost:8080/...` selon les endpoints définis.
+
+### 3. Arrêter les conteneurs
+
+Pour arrêter proprement l’environnement :
+
+```bash
+docker compose down
+```
+
+- Les conteneurs du backend et de PostgreSQL sont arrêtés et supprimés.
+- Le volume `producttrial_pgdata` **n’est pas supprimé**, les données restent donc persistantes pour le prochain démarrage.
+
+### 4. Relancer pour vérifier la persistance des données
+
+Après avoir inséré des données (via Postman par exemple) :
+
+1. Arrêter :
+
+   ```bash
+   docker compose down
+   ```
+
+2. Relancer :
+
+   ```bash
+   docker compose up -d
+   ```
+
+3. Re-tester les endpoints avec Postman : les données précédemment insérées doivent être toujours présentes grâce au volume Docker.
 
 
 ## Test avec Postman
 
-Le dossier postman possède un json environnement et un json collection pour tester les endpoints.
-Les requetes permettent de tester la plupart des cas d'utilisation du backend.
+Le dossier `postman` possède un json environnement et un json collection pour tester les endpoints.
+Les requêtes permettent de tester la plupart des cas d'utilisation du backend.
 
-À savoir de certains requetes pourraient de devoir être légèrement modifié s'il y a une persistance des données entre deux lancements de l'application.
+À savoir : certaines requêtes pourraient devoir être légèrement modifiées s'il y a une persistance des données entre deux lancements de l'application.
 
-## Résumé des branches
-| Branche         | BDD utilisée | Instructions principales                                                     |
-|-----------------| ------------ | ---------------------------------------------------------------------------- |
-| main            | H2 (simulé)  | `./mvnw spring-boot:run`                                                     |
-| bdd-docker      | PostgreSQL   | Créer DB et user si nécessaire, puis `$Env:DB_USER=… ./mvnw spring-boot:run` |
+## Résumé du mode de lancement
+
+| Mode                  | BDD utilisée             | Instructions principales                               |
+|-----------------------|--------------------------|---------------------------------------------------------|
+| PostgreSQL via Docker | PostgreSQL en conteneur  | `docker compose up -d --build` à la racine du projet   |
