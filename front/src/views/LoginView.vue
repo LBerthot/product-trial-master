@@ -1,30 +1,32 @@
 <script setup lang="ts">
-    import { ref } from 'vue'
-    import { http } from '../api/http'
+    import { ref } from 'vue';
+    import { useAuthStore } from '../stores/authStore';
+    import { useRouter } from 'vue-router';
     
-    const email = ref('admin@admin.com')
-    const password = ref('')
-    const loading = ref(false)
-    const error = ref<string | null>(null)
-    const token = ref<string | null>(null)
+    const email = ref('admin@admin.com');
+    const password = ref('');
+    const loading = ref(false);
+    const error = ref<string | null>(null);
+    const router = useRouter();
+    const authStore = useAuthStore();
 
     async function onSubmit() {
-        loading.value = true
-        error.value = null
-        token.value = null
+        loading.value = true;
+        error.value = null;
 
         try {
-            const response = await http.post('/token', {
-                email: email.value,
-                password: password.value
-            })
-            token.value = response.data.token
+            await authStore.login(email.value, password.value);
+            router.push('/products');
         } catch (e: any) {
-            const status = e?.response?.status
-            const message = e?.response?.data?.message
-            error.value = `Erreur API (${status ?? 'unknown'}): ${message ?? e?.message ?? 'unknown'}`
+            const status = e?.response?.status;
+            if (status === 401) {
+                error.value = "Identifiants invalides";
+            } else {
+                const message = e?.response?.data?.message;
+                error.value = `Erreur API (${status ?? "unknown"}): ${message ?? e?.message ?? "unknown"}`;
+            }
         } finally {
-            loading.value = false
+            loading.value = false;
         }
     }
 </script>
@@ -45,7 +47,6 @@
         </button>
     </form>
     <p v-if="error" class="error">{{ error }}</p>
-    <p v-if="token" class="success">{{ token }}</p>
 </template>
 
 <style scoped>
