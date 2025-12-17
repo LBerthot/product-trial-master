@@ -7,7 +7,7 @@
   const loading = ref(false);
   const error = ref<string | null>(null);
   const page = ref(0);
-  const size = ref(1);
+  const size = ref(10);
   const totalPages = ref(0);
 
   onMounted(() => {
@@ -51,8 +51,10 @@
     <div v-else>
       <ul>
         <li v-for="product in products" :key="product.id">
-          <img v-if="product.image && product.image.trim().length > 0" :src="product.image" :alt="product.name" /> {{ product.category }}
-          {{ product.name }} {{ product.price }}
+          <router-link :to="{name : 'product-detail', params: {id: product.id}}">
+            <img v-if="product.image && product.image.trim().length > 0" :src="product.image" :alt="product.name" /> {{ product.category }}
+            {{ product.name }} {{ product.price }}
+          </router-link>
         </li>
       </ul>
 
