@@ -3,9 +3,20 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  --ac-bg: #eaf6ef;
+  --ac-surface: #ffffff;
+  --ac-surface-2: #f6fff9;
+  --ac-text: #2d3a2f;
+  --ac-muted: #5b6b5f;
+  --ac-border: rgba(45, 58, 47, 0.12);
+  --ac-primary: #58b99a;
+  --ac-primary-hover: #45a98a;
+  --ac-accent: #f3c96b;
+  --ac-shadow: 0 10px 24px rgba(21, 54, 43, 0.10);
+
+  color-scheme: light;
+  color: var(--ac-text);
+  background-color: var(--ac-bg);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -15,65 +26,62 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--ac-primary);
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: var(--ac-primary-hover);
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background: var(--ac-bg);
+  color: var(--ac-text);
 }
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+  line-height: 1.15;
+  margin: 0 0 16px 0;
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
+  border-radius: 999px;
+  border: 1px solid var(--ac-border);
+  padding: clamp(0.55rem, 1.1vw, 0.75rem) clamp(0.9rem, 1.8vw, 1.2rem);
+  font-size: clamp(0.9rem, 1.2vw, 1rem);
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--ac-surface);
   cursor: pointer;
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: var(--ac-primary);
 }
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-.card {
-  padding: 2em;
-}
-
 #app {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  padding: 16px;
+  text-align: left;
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    color: var(--ac-text);
+    background-color: var(--ac-bg);
   }
   a:hover {
-    color: #747bff;
+    color: var(--ac-primary-hover);
   }
   button {
-    background-color: #f9f9f9;
+    background-color: var(--ac-surface);
   }
 }
