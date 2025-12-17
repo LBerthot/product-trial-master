@@ -5,6 +5,7 @@ Ce projet est un exercice pour gérer un backend de produits et wishlist. Il con
 ## Contenu du projet
 
 - Backend Spring Boot (back/)
+- Frontend Vue.js (front/)
 - Requêtes Postman pour tester les endpoints (dans le dossier postman/)
 - Utilisation d’une vraie base PostgreSQL via Docker (base en conteneur, données persistantes)
 
@@ -47,6 +48,7 @@ docker compose up -d --build
 Cette commande :
 
 - construit l’image du backend à partir de `back/Dockerfile` ;
+- construit et démarre le frontend (Vite) à partir de `front/Dockerfile` ;
 - télécharge et démarre un conteneur PostgreSQL `producttrial_db` (image `postgres:15`) ;
 - crée un volume Docker `producttrial_pgdata` pour persister les données ;
 - met les deux conteneurs sur le même réseau Docker ;
@@ -56,6 +58,12 @@ Une fois la commande terminée, l’API est accessible via :
 
 - navigateur : `http://localhost:8080`
 - Postman : `GET`/`POST` sur `http://localhost:8080/...` selon les endpoints définis.
+
+Le frontend est accessible via :
+
+- navigateur : `http://localhost:5173`
+
+Le frontend peut appeler le backend via le proxy Vite sur `/api` (ex: `http://localhost:5173/api/...`).
 
 ### 3. Arrêter les conteneurs
 
@@ -85,6 +93,23 @@ Après avoir inséré des données (via Postman par exemple) :
    ```
 
 3. Re-tester les endpoints avec Postman : les données précédemment insérées doivent être toujours présentes grâce au volume Docker.
+
+
+## Connexion à la base PostgreSQL via DBeaver
+
+La base PostgreSQL tourne dans un conteneur Docker, mais elle est exposée sur la machine hôte via le port défini par `DB_PORT`.
+
+Dans DBeaver, créer une connexion PostgreSQL avec les paramètres suivants :
+
+| Champ | Valeur |
+|------|--------|
+| Host | `localhost` |
+| Port | `5432` (ou la valeur de `DB_PORT` dans `.env`) |
+| Database | `producttrial` (ou `DB_NAME` dans `.env`) |
+| User | `producttrial_user` (ou `DB_USER` dans `.env`) |
+| Password | valeur de `DB_PASSWORD` dans `.env` |
+
+Remarque : les données sont persistées dans le volume Docker `producttrial_pgdata`.
 
 
 ## Test avec Postman
