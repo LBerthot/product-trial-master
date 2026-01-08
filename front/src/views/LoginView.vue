@@ -1,13 +1,14 @@
 <script setup lang="ts">
     import { ref } from 'vue';
     import { useAuthStore } from '../stores/authStore';
-    import { useRouter } from 'vue-router';
+    import { useRouter, useRoute } from 'vue-router';
     
     const email = ref('admin@admin.com');
     const password = ref('');
     const loading = ref(false);
     const error = ref<string | null>(null);
     const router = useRouter();
+    const route = useRoute();
     const authStore = useAuthStore();
 
     async function onSubmit() {
@@ -16,7 +17,12 @@
 
         try {
             await authStore.login(email.value, password.value);
+            const redirect = route.query.redirect;
+            if (typeof redirect === 'string' && redirect.startsWith('/') && !redirect.startsWith('//')) {
+            router.push(redirect);
+            } else {
             router.push('/products');
+            }
         } catch (e: any) {
             const status = e?.response?.status;
             if (status === 401) {

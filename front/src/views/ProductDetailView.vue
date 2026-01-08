@@ -1,8 +1,12 @@
 <script setup lang="ts">
     import { onMounted, ref, watch } from 'vue';
-    import { useRoute } from 'vue-router';
+    import { useRoute, useRouter } from 'vue-router';
     import { getProduct } from '../api/productApi';
     import type { ProductDTO } from '../types/dto/product';
+    import { useCartStore } from '../stores/cartStore';
+    import { useAuthStore } from '../stores/authStore';
+
+    const authStore = useAuthStore();
 
     const product = ref<ProductDTO | null>(null);
     const loading = ref(false);
@@ -10,6 +14,8 @@
     const quantity = ref(1);
 
     const route = useRoute();
+    const router = useRouter();
+    const cartStore = useCartStore();
     
     onMounted(() => {
         loadProduct();
@@ -48,9 +54,15 @@
         }
     }
 
-    function addToCart() {
+    async function addToCart() {
+        if (!product.value) return;
+        if (!authStore.isAuthenticated()) {
+            router.push({ name: 'login', query: { redirect: route.fullPath } });
+            return;
+        }
         const q = Math.max(1, Number(quantity.value) || 1);
         quantity.value = q;
+        await cartStore.addItem(product.value.id, q);
     }
 
 </script>
