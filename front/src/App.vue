@@ -8,6 +8,7 @@ import { RouterView } from 'vue-router'
     <router-link to="/login">Login</router-link>
     <router-link to="/products">Products</router-link>
     <router-link to="/cart">Cart</router-link>
+    <router-link to="/wishlist">Wishlist</router-link>
   </header>
   <router-view />
 </template>

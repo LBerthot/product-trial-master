@@ -5,6 +5,8 @@
     import type { ProductDTO } from '../types/dto/product';
     import { useCartStore } from '../stores/cartStore';
     import { useAuthStore } from '../stores/authStore';
+    import { useWishlistStore } from '../stores/wishlistStore';
+    import ToggleButton from '../components/ToggleButton.vue';
 
     const authStore = useAuthStore();
 
@@ -16,9 +18,13 @@
     const route = useRoute();
     const router = useRouter();
     const cartStore = useCartStore();
+    const wishlistStore = useWishlistStore();
     
     onMounted(() => {
         loadProduct();
+        if (authStore.isAuthenticated()) {
+            wishlistStore.loadWishlist();
+        }
     });
 
     watch(
@@ -65,6 +71,15 @@
         await cartStore.addItem(product.value.id, q);
     }
 
+    async function onWishlistToggle() {
+        if (!product.value) return;
+        if (!authStore.isAuthenticated()) {
+            router.push({ name: 'login', query: { redirect: route.fullPath } });
+            return;
+        }
+        await wishlistStore.toggle(product.value.id);
+    }
+
 </script>
 
 <template>
@@ -100,6 +115,14 @@
                             <input type="number" min="1" step="1" v-model.number="quantity" />
                         </label>
                         <button @click="addToCart">Ajouter au panier</button>
+                        <ToggleButton
+                            v-if="product"
+                            :model-value="wishlistStore.isInWishlist(product.id)"
+                            inactive-label="Ajouter à la wishlist"
+                            active-label="Enlever de la wishlist"
+                            :disabled="wishlistStore.loading"
+                            @toggle="onWishlistToggle"
+                        />
                     </div>
                 </div>
             </div>

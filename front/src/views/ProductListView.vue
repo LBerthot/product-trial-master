@@ -1,8 +1,12 @@
 <script setup lang="ts">
   import { onMounted, ref } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
   import { getProducts } from '../api/productApi';
   import type { ProductDTO } from '../types/dto/product';
   import ProductCard from '../components/ProductCard.vue';
+  import ToggleButton from '../components/ToggleButton.vue';
+  import { useWishlistStore } from '../stores/wishlistStore';
+  import { useAuthStore } from '../stores/authStore';
 
   const products = ref<ProductDTO[]>([]);
   const loading = ref(false);
@@ -11,9 +15,25 @@
   const size = ref(10);
   const totalPages = ref(0);
 
+  const route = useRoute();
+  const router = useRouter();
+  const wishlistStore = useWishlistStore();
+  const authStore = useAuthStore();
+
   onMounted(() => {
     loadProducts();
+    if (authStore.isAuthenticated()) {
+      wishlistStore.loadWishlist();
+    }
   });
+
+  async function onWishlistToggle(productId: number) {
+    if (!authStore.isAuthenticated()) {
+      router.push({ name: 'login', query: { redirect: route.fullPath } });
+      return;
+    }
+    await wishlistStore.toggle(productId);
+  }
 
   async function loadProducts() {
     try {
@@ -40,7 +60,6 @@
     page.value += 1;
     await loadProducts();
   }
-
 </script>
 
 <template>
@@ -50,14 +69,14 @@
     <p v-if="error">{{ error }}</p>
 
     <div class="product-grid" :class="{ 'is-loading': loading }">
-      <router-link
-        v-for="product in products"
-        :key="product.id"
-        class="product-link"
-        :to="{ name: 'product-detail', params: { id: product.id } }"
-      >
-        <ProductCard :product="product" />
-      </router-link>
+      <div v-for="product in products" :key="product.id" class="product-item">
+        <router-link
+          class="product-link"
+          :to="{ name: 'product-detail', params: { id: product.id } }"
+        >
+          <ProductCard :product="product" />
+        </router-link>
+      </div>
     </div>
 
     <div class="pagination">
@@ -80,6 +99,16 @@
     gap: clamp(12px, 2vw, 20px);
     align-items: stretch;
     transition: opacity 160ms ease;
+  }
+
+  .product-item {
+    display: grid;
+    gap: 10px;
+  }
+
+  .product-actions {
+    display: flex;
+    justify-content: center;
   }
 
   .product-link {
