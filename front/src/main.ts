@@ -10,6 +10,7 @@ const pinia = createPinia();
 app.use(pinia);
 
 const authStore = useAuthStore();
-authStore.restoreFromLocalStorage();
-app.use(router);
-app.mount('#app');
+authStore.restoreFromLocalStorage().then(() => {
+    app.use(router);
+    app.mount('#app');
+});

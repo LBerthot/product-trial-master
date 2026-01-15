@@ -2,6 +2,7 @@
     import { onMounted, ref, watch } from 'vue';
     import { useRoute, useRouter } from 'vue-router';
     import { getProduct } from '../api/productApi';
+    import { updateProduct, deleteProduct } from '../api/adminProductsApi';
     import type { ProductDTO } from '../types/dto/product';
     import { useCartStore } from '../stores/cartStore';
     import { useAuthStore } from '../stores/authStore';
@@ -14,6 +15,12 @@
     const loading = ref(false);
     const error = ref<string | null>(null);
     const quantity = ref(1);
+
+    const isEditing = ref(false);
+    const editForm = ref({ code: '', name: '', price: 0, description: '' });
+    const editError = ref<string | null>(null);
+    const editLoading = ref(false);
+    const deleteLoading = ref(false);
 
     const route = useRoute();
     const router = useRouter();
@@ -80,6 +87,68 @@
         await wishlistStore.toggle(product.value.id);
     }
 
+    function startEdit() {
+        if (!product.value) return;
+        editForm.value = {
+            code: product.value.code,
+            name: product.value.name,
+            price: product.value.price,
+            description: product.value.description ?? ''
+        };
+        editError.value = null;
+        isEditing.value = true;
+    }
+
+    function cancelEdit() {
+        isEditing.value = false;
+        editError.value = null;
+    }
+
+    async function submitEdit() {
+        if (!product.value) return;
+        if (!editForm.value.code || !editForm.value.name || editForm.value.price <= 0) {
+            editError.value = 'Code, nom et prix (> 0) sont obligatoires.';
+            return;
+        }
+        try {
+            editLoading.value = true;
+            editError.value = null;
+            const updated = await updateProduct(product.value.id, editForm.value);
+            product.value = updated;
+            isEditing.value = false;
+        } catch (e: any) {
+            if (e?.response?.status === 401) {
+                router.push({ name: 'login', query: { redirect: route.fullPath } });
+            } else if (e?.response?.status === 403) {
+                editError.value = 'Accès refusé : admin uniquement.';
+            } else {
+                editError.value = e?.response?.data?.message || e.message || 'Erreur lors de la modification.';
+            }
+        } finally {
+            editLoading.value = false;
+        }
+    }
+
+    async function confirmDelete() {
+        if (!product.value) return;
+        if (!confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) return;
+        try {
+            deleteLoading.value = true;
+            await deleteProduct(product.value.id);
+            router.push({ name: 'products' });
+        } catch (e: any) {
+            if (e?.response?.status === 401) {
+                router.push({ name: 'login', query: { redirect: route.fullPath } });
+            } else if (e?.response?.status === 403) {
+                error.value = 'Accès refusé : admin uniquement.';
+            } else {
+                error.value = e?.response?.data?.message || e.message || 'Erreur lors de la suppression.';
+            }
+        } finally {
+            deleteLoading.value = false;
+        }
+    }
+
 </script>
 
 <template>
@@ -123,6 +192,43 @@
                             :disabled="wishlistStore.loading"
                             @toggle="onWishlistToggle"
                         />
+                    </div>
+
+                    <div v-if="authStore.isAdmin()" class="admin-section">
+                        <h3>Administration</h3>
+                        
+                        <div v-if="!isEditing" class="admin-buttons">
+                            <button @click="startEdit" class="btn-edit">Modifier</button>
+                            <button @click="confirmDelete" :disabled="deleteLoading" class="btn-delete">
+                                {{ deleteLoading ? 'Suppression...' : 'Supprimer' }}
+                            </button>
+                        </div>
+
+                        <div v-else class="edit-form">
+                            <p v-if="editError" class="form-error">{{ editError }}</p>
+                            <label>
+                                Code
+                                <input v-model="editForm.code" type="text" />
+                            </label>
+                            <label>
+                                Nom
+                                <input v-model="editForm.name" type="text" />
+                            </label>
+                            <label>
+                                Prix
+                                <input v-model.number="editForm.price" type="number" min="0.01" step="0.01" />
+                            </label>
+                            <label>
+                                Description
+                                <textarea v-model="editForm.description" rows="3"></textarea>
+                            </label>
+                            <div class="form-buttons">
+                                <button @click="submitEdit" :disabled="editLoading">
+                                    {{ editLoading ? 'Enregistrement...' : 'Enregistrer' }}
+                                </button>
+                                <button @click="cancelEdit" type="button" class="btn-cancel">Annuler</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -232,6 +338,79 @@
         border: 1px solid var(--ac-border);
         background: var(--ac-surface-2);
         color: var(--ac-text);
+    }
+
+    .admin-section {
+        margin-top: clamp(16px, 2.5vw, 24px);
+        padding-top: clamp(14px, 2vw, 18px);
+        border-top: 1px solid var(--ac-border);
+    }
+
+    .admin-section h3 {
+        margin: 0 0 12px 0;
+        font-size: 1rem;
+        color: var(--ac-muted);
+    }
+
+    .admin-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-edit {
+        background: var(--ac-primary);
+        color: white;
+    }
+
+    .btn-delete {
+        background: #c0392b;
+        color: white;
+    }
+
+    .btn-delete:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .edit-form {
+        display: grid;
+        gap: 12px;
+        max-width: 400px;
+    }
+
+    .edit-form label {
+        display: grid;
+        gap: 4px;
+        font-size: 0.9rem;
+        color: var(--ac-muted);
+    }
+
+    .edit-form input,
+    .edit-form textarea {
+        padding: 0.5rem 0.7rem;
+        border-radius: 8px;
+        border: 1px solid var(--ac-border);
+        background: var(--ac-surface-2);
+        color: var(--ac-text);
+        font-family: inherit;
+    }
+
+    .form-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 8px;
+    }
+
+    .btn-cancel {
+        background: transparent;
+        border: 1px solid var(--ac-border);
+        color: var(--ac-muted);
+    }
+
+    .form-error {
+        color: #c0392b;
+        font-size: 0.9rem;
+        margin: 0;
     }
 </style>
 
