@@ -45,6 +45,12 @@ Les valeurs par défaut conviennent pour un usage de test/local.
 docker compose up -d --build
 ```
 
+En cas de problème de build :
+```bash
+docker builder prune -af # supprime tout le cache BuildKit
+docker compose up -d --build # rebuild complet
+```
+
 Cette commande :
 
 - construit l’image du backend à partir de `back/Dockerfile` ;
