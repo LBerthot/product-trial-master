@@ -5,6 +5,7 @@ import com.producttrial.back.entity.Product;
 import com.producttrial.back.mapper.ProductMapper;
 import com.producttrial.back.service.IAuthorizationService;
 import com.producttrial.back.service.IProductService;
+import com.producttrial.back.service.kafka.KafkaProducerService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -26,9 +27,10 @@ import org.springframework.web.server.ResponseStatusException;
 public class ProductController {
     private final IProductService productService;
     private final IAuthorizationService authzService;
+    private final KafkaProducerService kafkaProducerService;
     
     @GetMapping
-    public Page<ProductDTO> getAllProducts(@PageableDefault(size = 50, page = 0) Pageable pageable) {
+    public Page<ProductDTO> getAllProducts(@PageableDefault(size = 50) Pageable pageable) {
         log.info("GET /products page={} size={}", pageable.getPageNumber(), pageable.getPageSize());
         if (pageable.getPageSize() < 200) {
             return productService.getAllProducts(pageable);
@@ -40,10 +42,13 @@ public class ProductController {
     @GetMapping("/{id}")
     public ProductDTO getProduct(@PathVariable @Positive Long id) {
         log.info("GET /products/{}", id);
-        return productService.getProductById(id).orElseThrow(() -> {
+        ProductDTO product = productService.getProductById(id).orElseThrow(() -> {
             log.warn("Product not found id={}", id);
             return new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found with id " + id);
         });
+        
+        kafkaProducerService.sendProductViewed(id, null);
+        return product;
     }
 
     @PostMapping
